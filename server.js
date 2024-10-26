@@ -59,6 +59,7 @@ const chatRoutes = require("./routes/chatRoutes.js");
 const logRoutes = require("./routes/logRoutes");
 const historicalDataRoutes = require("./routes/historicalDataRoutes");
 const productTrackingRoutes = require("./routes/productRoutes.js");
+const kpiRoutes = require("./routes/kpi.js")
 
 // routes
 
@@ -75,6 +76,7 @@ app.use("/chat", chatRoutes);
 app.use("/historical-data", historicalDataRoutes);
 app.use("/logs", logRoutes);
 app.use("/order-tracking",productTrackingRoutes);
+app.use('/api/kpi', kpiRoutes);
 
 const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => {
