@@ -20,43 +20,49 @@ class PredictiveMaintenanceService {
   /**
    * Train the ML model using historical data
    */
+  // async trainModel() {
+  //   return new Promise((resolve, reject) => {
+  //     const pythonProcess = spawn("py", [
+  //       "-3.13",
+  //       path.join(__dirname, "../ml_models/train_predictive_model.py"),
+  //     ]);
+
+  //     let output = "";
+  //     let error = "";
+
+  //     pythonProcess.stdout.on("data", (data) => {
+  //       output += data.toString();
+  //       console.log("[ML Training]", data.toString().trim());
+  //     });
+
+  //     pythonProcess.stderr.on("data", (data) => {
+  //       error += data.toString();
+  //       console.error("[ML Training Error]", data.toString().trim());
+  //     });
+
+  //     pythonProcess.on("close", (code) => {
+  //       if (code === 0) {
+  //         console.log("Model training completed successfully");
+  //         resolve(output);
+  //       } else {
+  //         reject(new Error(`Training failed with exit code ${code}: ${error}`));
+  //       }
+  //     });
+
+  //     // Timeout after 30 minutes
+  //     setTimeout(() => {
+  //       pythonProcess.kill();
+  //       reject(new Error("Model training timeout"));
+  //     }, 30 * 60 * 1000);
+  //   });
+  // }
+
   async trainModel() {
-    return new Promise((resolve, reject) => {
-      const pythonProcess = spawn("py", [
-        "-3.13",
-        path.join(__dirname, "../ml_models/train_predictive_model.py"),
-      ]);
-
-      let output = "";
-      let error = "";
-
-      pythonProcess.stdout.on("data", (data) => {
-        output += data.toString();
-        console.log("[ML Training]", data.toString().trim());
-      });
-
-      pythonProcess.stderr.on("data", (data) => {
-        error += data.toString();
-        console.error("[ML Training Error]", data.toString().trim());
-      });
-
-      pythonProcess.on("close", (code) => {
-        if (code === 0) {
-          console.log("Model training completed successfully");
-          resolve(output);
-        } else {
-          reject(new Error(`Training failed with exit code ${code}: ${error}`));
-        }
-      });
-
-      // Timeout after 30 minutes
-      setTimeout(() => {
-        pythonProcess.kill();
-        reject(new Error("Model training timeout"));
-      }, 30 * 60 * 1000);
-    });
-  }
-
+  throw new Error(
+    "Model training is disabled in the cloud deployment. " +
+    "Train locally and commit the .pkl file to the repository."
+  );
+}
   /**
    * Make predictions for a specific machine using current sensor data
    */
@@ -132,47 +138,80 @@ class PredictiveMaintenanceService {
   /**
    * Run Python inference script
    */
+  // async runPythonInference(inputData, modelPath) {
+  //   return new Promise((resolve, reject) => {
+  //     const pythonProcess = spawn("py", [
+  //       "-3.13",
+  //       this.pythonScriptPath,
+  //       JSON.stringify(inputData),
+  //       modelPath,
+  //     ]);
+
+  //     let output = "";
+  //     let error = "";
+
+  //     pythonProcess.stdout.on("data", (data) => {
+  //       output += data.toString();
+  //     });
+
+  //     pythonProcess.stderr.on("data", (data) => {
+  //       error += data.toString();
+  //       console.error("[Inference Error]", data.toString().trim());
+  //     });
+
+  //     pythonProcess.on("close", (code) => {
+  //       if (code === 0) {
+  //         try {
+  //           const prediction = JSON.parse(output);
+  //           resolve(prediction);
+  //         } catch (e) {
+  //           reject(new Error(`Failed to parse prediction output: ${output}`));
+  //         }
+  //       } else {
+  //         reject(new Error(`Inference failed: ${error}`));
+  //       }
+  //     });
+
+  //     // Timeout after 30 seconds (increased for model loading)
+  //     setTimeout(() => {
+  //       pythonProcess.kill();
+  //       reject(new Error("Inference timeout"));
+  //     }, 30000);
+  //   });
+  // }
+
   async runPythonInference(inputData, modelPath) {
-    return new Promise((resolve, reject) => {
-      const pythonProcess = spawn("py", [
-        "-3.13",
-        this.pythonScriptPath,
-        JSON.stringify(inputData),
-        modelPath,
-      ]);
-
-      let output = "";
-      let error = "";
-
-      pythonProcess.stdout.on("data", (data) => {
-        output += data.toString();
-      });
-
-      pythonProcess.stderr.on("data", (data) => {
-        error += data.toString();
-        console.error("[Inference Error]", data.toString().trim());
-      });
-
-      pythonProcess.on("close", (code) => {
-        if (code === 0) {
-          try {
-            const prediction = JSON.parse(output);
-            resolve(prediction);
-          } catch (e) {
-            reject(new Error(`Failed to parse prediction output: ${output}`));
-          }
-        } else {
-          reject(new Error(`Inference failed: ${error}`));
-        }
-      });
-
-      // Timeout after 30 seconds (increased for model loading)
-      setTimeout(() => {
-        pythonProcess.kill();
-        reject(new Error("Inference timeout"));
-      }, 30000);
-    });
+  const mlServiceUrl = process.env.ML_SERVICE_URL;
+  if (!mlServiceUrl) {
+    throw new Error("ML_SERVICE_URL environment variable is not set");
   }
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000);
+
+  try {
+    const response = await fetch(`${mlServiceUrl}/predict`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(inputData),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`ML service error ${response.status}: ${errText}`);
+    }
+
+    return await response.json();
+  } catch (err) {
+    if (err.name === "AbortError") {
+      throw new Error("Inference timeout: ML service did not respond in 30s");
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
 
   /**
    * Extract features from machine data for ML model

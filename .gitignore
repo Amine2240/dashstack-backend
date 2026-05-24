@@ -2,3 +2,5 @@ node_modules
 myenv/
 .env
 .venv/
+.env
+firebase-config.json
