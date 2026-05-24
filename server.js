@@ -59,7 +59,7 @@ const chatRoutes = require("./routes/chatRoutes.js");
 const logRoutes = require("./routes/logRoutes");
 const historicalDataRoutes = require("./routes/historicalDataRoutes");
 const productTrackingRoutes = require("./routes/productRoutes.js");
-const kpiRoutes = require("./routes/kpi.js")
+const kpiRoutes = require("./routes/kpi.js");
 
 // routes
 
@@ -75,8 +75,21 @@ app.use("/energy", energyRoutes);
 app.use("/chat", chatRoutes);
 app.use("/historical-data", historicalDataRoutes);
 app.use("/logs", logRoutes);
-app.use("/order-tracking",productTrackingRoutes);
-app.use('/api/kpi', kpiRoutes);
+app.use("/order-tracking", productTrackingRoutes);
+app.use("/api/kpi", kpiRoutes);
+
+// Load predictive maintenance routes with error handling
+try {
+  const predictiveMaintenanceRoutes = require("./routes/predictiveMaintenanceRoutes.js");
+  app.use("/api/maintenance", predictiveMaintenanceRoutes);
+  console.log("✅ Predictive maintenance routes loaded successfully");
+} catch (error) {
+  console.error(
+    "❌ Error loading predictive maintenance routes:",
+    error.message
+  );
+  console.error(error.stack);
+}
 
 const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => {

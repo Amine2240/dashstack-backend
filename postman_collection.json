@@ -1,0 +1,243 @@
+{
+  "info": {
+    "name": "DashStack Predictive Maintenance API",
+    "description": "Complete API collection for predictive maintenance system",
+    "version": "1.0.0"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "YOUR_JWT_TOKEN_HERE",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Training & Model Management",
+      "item": [
+        {
+          "name": "Train Model",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/api/maintenance/train",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "maintenance", "train"]
+            },
+            "description": "Train/retrain the ML model on historical data"
+          }
+        },
+        {
+          "name": "Get Model Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/api/maintenance/model-metrics",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "maintenance", "model-metrics"]
+            },
+            "description": "Get current model performance metrics (accuracy, precision, etc.)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Making Predictions",
+      "item": [
+        {
+          "name": "Single Machine Prediction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"kpi_value\": 2.5,\n  \"temperature\": 85,\n  \"vibration\": 4.2,\n  \"pressure\": 8.5,\n  \"runtime_hours\": 2400,\n  \"error_count\": 5,\n  \"efficiency\": 72,\n  \"power_consumption\": 3500\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/maintenance/predict/agv_003",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "maintenance", "predict", "agv_003"]
+            },
+            "description": "Make a maintenance prediction for a specific machine"
+          }
+        },
+        {
+          "name": "Batch Predictions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"machines\": [\n    {\n      \"machine_id\": \"agv_003\",\n      \"temperature\": 85,\n      \"vibration\": 4.2,\n      \"efficiency\": 72,\n      \"error_count\": 5\n    },\n    {\n      \"machine_id\": \"cnc_milling_004\",\n      \"temperature\": 92,\n      \"vibration\": 6.1,\n      \"efficiency\": 65,\n      \"error_count\": 8\n    },\n    {\n      \"machine_id\": \"welding_robot_006\",\n      \"temperature\": 78,\n      \"vibration\": 3.2,\n      \"efficiency\": 88,\n      \"error_count\": 2\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/maintenance/batch-predict",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "maintenance", "batch-predict"]
+            },
+            "description": "Make predictions for multiple machines at once"
+          }
+        },
+        {
+          "name": "Get Latest Prediction",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/api/maintenance/prediction/agv_003",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "maintenance", "prediction", "agv_003"]
+            },
+            "description": "Get the most recent prediction for a specific machine"
+          }
+        },
+        {
+          "name": "Get Prediction History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/api/maintenance/history/agv_003?limit=50",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "maintenance", "history", "agv_003"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            },
+            "description": "Get prediction history for a machine (last N predictions)"
+          }
+        },
+        {
+          "name": "Get All Recommendations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/api/maintenance/all-recommendations",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "maintenance", "all-recommendations"]
+            },
+            "description": "Get all active maintenance recommendations for all machines"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Maintenance Records",
+      "item": [
+        {
+          "name": "Record Maintenance",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"maintenance_type\": \"predictive\",\n  \"description\": \"Replaced bearing and lubricated components\",\n  \"predicted_failure\": true,\n  \"actions_performed\": [\"bearing_replacement\", \"lubrication\", \"testing\"],\n  \"parts_replaced\": [\"main_bearing\", \"seal_kit\"],\n  \"duration_minutes\": 120,\n  \"technician_notes\": \"Machine running smoothly after maintenance\",\n  \"next_maintenance_due\": \"2026-03-05T00:00:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/api/maintenance/record/agv_003",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "maintenance", "record", "agv_003"]
+            },
+            "description": "Record a completed maintenance action"
+          }
+        },
+        {
+          "name": "Get All Maintenance History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/api/maintenance/maintenance-history?limit=100",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "maintenance", "maintenance-history"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "100"
+                },
+                {
+                  "key": "machine_id",
+                  "value": "agv_003",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get all maintenance history records (optionally filtered by machine_id)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard & Analytics",
+      "item": [
+        {
+          "name": "Dashboard Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/api/maintenance/dashboard/summary",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "maintenance", "dashboard", "summary"]
+            },
+            "description": "Get comprehensive dashboard summary of all machines"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Operations",
+      "item": [
+        {
+          "name": "Clear Predictions (Admin Only)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/api/maintenance/predictions/agv_003",
+              "host": ["{{BASE_URL}}"],
+              "path": ["api", "maintenance", "predictions", "agv_003"]
+            },
+            "description": "Delete all predictions for a machine (admin only)"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "BASE_URL",
+      "value": "http://localhost:4000",
+      "type": "string"
+    }
+  ]
+}

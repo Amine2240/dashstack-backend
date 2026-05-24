@@ -1,0 +1,8 @@
+{
+  "temperature": 95,
+  "vibration": 8.5,
+  "efficiency": 45,
+  "error_count": 25,
+  "kpi_name": "Stamping Press Efficiency",
+  "kpi_value": 45
+}
