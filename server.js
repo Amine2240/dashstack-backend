@@ -77,6 +77,7 @@ app.use("/historical-data", historicalDataRoutes);
 app.use("/logs", logRoutes);
 app.use("/order-tracking", productTrackingRoutes);
 app.use("/api/kpi", kpiRoutes);
+app.get('/health', (req, res) => res.status(200).json({ status: 'ok' }));
 
 // Load predictive maintenance routes with error handling
 try {
